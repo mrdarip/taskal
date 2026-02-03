@@ -1,0 +1,19 @@
+{
+  "name": "taskal-client",
+  "version": "1.0.0",
+  "description": "Servidor Node.js con Google Calendar para clientes legacy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["calendar", "google-calendar", "legacy", "ssr"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "googleapis": "^128.0.0",
+    "dotenv": "^16.3.1"
+  }
+}

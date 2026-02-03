@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - Last 7 Days</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #4285f4;
+      padding-bottom: 10px;
+    }
+    .error-box {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .event {
+      background-color: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #4285f4;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .event-date {
+      font-weight: bold;
+      color: #4285f4;
+      font-size: 1.1em;
+    }
+    .event-time {
+      color: #666;
+      font-size: 0.9em;
+    }
+    .event-title {
+      font-size: 1.2em;
+      margin: 5px 0;
+      color: #333;
+    }
+    .event-location {
+      color: #666;
+      font-style: italic;
+    }
+    .event-description {
+      color: #555;
+      margin-top: 5px;
+    }
+    .no-events {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Events - Last 7 Days</h1>
+  
+  <% if (error === 'no_config') { %>
+    <div class="error-box">
+      <strong>Configuration Pending</strong><br>
+      Not connected to Google Calendar yet.<br>
+      <a href="<%= adminUrl %>">Go to admin panel</a>
+    </div>
+  <% } else if (error === 'calendar_error') { %>
+    <div class="error-box">
+      <strong>Error loading events</strong><br>
+      Could not load events from Google Calendar.<br>
+      <a href="<%= adminUrl %>">Check configuration</a>
+    </div>
+  <% } %>
+  
+  <% if (events.length === 0 && !error) { %>
+    <div class="no-events">
+      <p>No events in the last 7 days</p>
+    </div>
+  <% } %>
+  
+  <% events.forEach(function(event) { %>
+    <div class="event">
+      <div class="event-date">
+        <%= event.date %>
+        <% if (event.time) { %>
+          <span class="event-time">(<%= event.time %>)</span>
+        <% } %>
+      </div>
+      <div class="event-title"><%= event.title %></div>
+      <% if (event.location) { %>
+        <div class="event-location">📍 <%= event.location %></div>
+      <% } %>
+      <% if (event.description) { %>
+        <div class="event-description"><%= event.description %></div>
+      <% } %>
+    </div>
+  <% }); %>
+  
+  <div class="footer">
+    Taskal
+  </div>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Google Calendar</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status.disconnected {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    
+    .status-icon {
+      font-size: 1.5em;
+    }
+    
+    .info-group {
+      margin-bottom: 20px;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    
+    .info-value {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.9em;
+      word-break: break-all;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #4285f4;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #3367d6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .instructions {
+      background: #e7f3ff;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #4285f4;
+    }
+    
+    .instructions h3 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .instructions ol {
+      margin-left: 20px;
+    }
+    
+    .instructions li {
+      margin-bottom: 10px;
+      color: #555;
+    }
+    
+    .instructions code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Admin Panel</h1>
+      <p class="subtitle">Google Calendar Configuration</p>
+      
+      <% if (hasTokens) { %>
+        <div class="status connected">
+          <span class="status-icon">✅</span>
+          <div>
+            <strong>Connected to Google Calendar</strong><br>
+            <small>Events are syncing correctly</small>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="status disconnected">
+          <span class="status-icon">⚠️</span>
+          <div>
+            <strong>Not connected</strong><br>
+            <small>You need to authorize access to Google Calendar</small>
+          </div>
+        </div>
+      <% } %>
+      
+      <div class="actions">
+        <% if (hasTokens) { %>
+          <button class="btn btn-danger" onclick="disconnect()">
+            Disconnect
+          </button>
+          <a href="/" class="btn btn-secondary">View Events</a>
+        <% } else { %>
+          <a href="/admin/connect" class="btn btn-primary">
+            Connect to Google Calendar
+          </a>
+        <% } %>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>Configuration Information</h3>
+      
+      <div class="info-group">
+        <div class="info-label">Client ID</div>
+        <div class="info-value"><%= clientId %></div>
+      </div>
+      
+      <div class="info-group">
+        <div class="info-label">Redirect URI</div>
+        <div class="info-value"><%= redirectUri %></div>
+      </div>
+    </div>
+    
+    <% if (!hasTokens) { %>
+    <div class="card instructions">
+      <h3>Configuration Instructions</h3>
+      <ol>
+        <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+        <li>Create a new project or select an existing one</li>
+        <li>Enable the <strong>Google Calendar API</strong></li>
+        <li>Go to <strong>Credentials</strong> → <strong>Create Credentials</strong> → <strong>OAuth 2.0 Client ID</strong></li>
+        <li>Configure the authorized origins:
+          <ul>
+            <li><code>http://localhost:3000</code></li>
+          </ul>
+        </li>
+        <li>Configure the authorized redirect URIs:
+          <ul>
+            <li><code><%= redirectUri %></code></li>
+          </ul>
+        </li>
+        <li>Copy the <strong>Client ID</strong> and <strong>Client Secret</strong> into your <code>.env</code> file</li>
+        <li>Click "Connect to Google Calendar" above</li>
+      </ol>
+    </div>
+    <% } %>
+  </div>
+  
+  <script src="/admin.js"></script>
+</body>
+</html>
