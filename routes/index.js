@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
     
     if (!hasTokens) {
       return res.render('index', {
-        events: [],
+        eventsGroupedByDate: {},
+        sortedDays: [],
         error: 'no_config',
         adminUrl: '/admin'
       });
@@ -19,16 +20,44 @@ router.get('/', async (req, res) => {
     
     const events = await calendarService.getLast7DaysEvents();
     
-    const formattedEvents = events.map(event => ({
-      title: event.title,
-      date: calendarService.formatDate(event.date),
-      time: calendarService.formatTime(event.date),
-      location: event.location,
-      description: event.description
-    }));
+    const formattedEvents = events.map(event => {
+      const startDate = new Date(event.date);
+      const endDate = event.endDate ? new Date(event.endDate) : null;
+      const durationMins = endDate ? Math.round((endDate - startDate) / 60000) : 0;
+
+      const attributes = JSON.parse(event.description || '{}');
+      
+      return {
+        id: event.id,
+        title: event.title,
+        dateKey: startDate.toISOString().split('T')[0],
+        displayDate: calendarService.formatDate(event.date),
+        time: calendarService.formatTime(event.date),
+        duration: event.expectedDuration || durationMins,
+        location: event.location,
+        description: event.description,
+        finished: attributes.finished || false
+      };
+    }).filter(event => !event.finished); // Filter out finished events
+
+    const eventsGroupedByDate = {};
+    formattedEvents.forEach(event => {
+      if (!eventsGroupedByDate[event.dateKey]) {
+        eventsGroupedByDate[event.dateKey] = {
+          displayDate: event.displayDate,
+          relDisplayDate: getRelativeLabel(event.dateKey),
+          events: []
+        };
+      }
+      eventsGroupedByDate[event.dateKey].events.push(event);
+    });
+    
+    // Sort days in descending order
+    const sortedDays = Object.keys(eventsGroupedByDate).sort((a, b) => a.localeCompare(b));
     
     res.render('index', {
-      events: formattedEvents,
+      eventsGroupedByDate,
+      sortedDays,
       error: null,
       adminUrl: '/admin'
     });
@@ -38,11 +67,25 @@ router.get('/', async (req, res) => {
     
     // Render with error but don't break the page
     res.render('index', {
-      events: [],
+      eventsGroupedByDate: {},
+      sortedDays: [],
       error: 'calendar_error',
       adminUrl: '/admin'
     });
   }
 });
+
+function getRelativeLabel(dateStr) {
+  const target = new Date(dateStr);
+  target.setHours(0,0,0,0);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diff = Math.round((target - today) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  if (diff === -1) return 'Yesterday';
+  if (diff > 0) return `In ${diff} days`;
+  return `${Math.abs(diff)} days ago`;
+};
 
 module.exports = router;

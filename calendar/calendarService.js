@@ -5,7 +5,7 @@ let eventsCache = null;
 let cacheTimestamp = null;
 const CACHE_DURATION = 5 * 1000;
 
-async function getLast7DaysEvents() {
+async function getLastMonthEvents() {
   if (eventsCache && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION)) {
     console.log('request hit cache!');
     return eventsCache;
@@ -17,23 +17,27 @@ async function getLast7DaysEvents() {
     
     // Calcular fechas
     const now = new Date();
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(now.getDate() - 7);
+    const tomorrow = new Date();
+    tomorrow.setDate(now.getDate() + 2);
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(now.getDate() - 10);
     
     // Obtener eventos
     const response = await calendar.events.list({
-      calendarId: 'default',
-      timeMin: sevenDaysAgo.toISOString(),
-      timeMax: now.toISOString(),
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      timeMin: tenDaysAgo.toISOString(),
+      timeMax: tomorrow.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
-      maxResults: 50
+      maxResults: 200
     });
     
     const events = response.data.items.map(event => ({
       id: event.id,
-      title: event.summary || 'No title',
+      title: event.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
+      expectedDuration: event.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
       date: event.start.dateTime || event.start.date,
+      endDate: event.end ? (event.end.dateTime || event.end.date) : null,
       location: event.location || '',
       description: event.description || ''
     }));
@@ -84,7 +88,7 @@ function formatTime(dateString) {
 }
 
 module.exports = {
-  getLast7DaysEvents,
+  getLast7DaysEvents: getLastMonthEvents,
   clearCache,
   formatDate,
   formatTime
