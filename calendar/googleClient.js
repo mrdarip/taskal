@@ -14,7 +14,7 @@ function getAuthUrl() {
   
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scope: ['https://www.googleapis.com/auth/calendar.events'],
     prompt: 'consent' // Force to show consent screen every time
   });
 }

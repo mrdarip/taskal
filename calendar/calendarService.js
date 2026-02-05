@@ -61,6 +61,58 @@ async function getLastMonthEvents() {
   }
 }
 
+async function startEvent(eventId) {
+  try {
+    const auth = await googleClient.getAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth });
+    
+    const eventResponse = await calendar.events.get({
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      eventId
+    });
+    
+    const event = eventResponse.data;
+    
+    if (!event) {
+      throw new Error('Event not found');
+    }
+    
+    // Marcar como iniciado (agregar atributo "started" a la descripción)
+    const description = event.description || '';
+    const attributes = JSON.parse(description || '{}');
+    attributes.started = true;
+    
+    //set start time to now
+    const now = new Date();
+    event.start = { dateTime: now.toISOString() };
+    const updatedEvent = await calendar.events.patch({
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      eventId,
+      requestBody: {
+        ...event,
+        description: JSON.stringify(attributes)
+      }
+    });
+    
+    // Clear cache to force refresh on next fetch
+    clearCache();
+    
+    return {
+      id: updatedEvent.data.id,
+      title: updatedEvent.data.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
+      expectedDuration: updatedEvent.data.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
+      date: updatedEvent.data.start.dateTime || updatedEvent.data.start.date,
+      endDate: updatedEvent.data.end ? (updatedEvent.data.end.dateTime || updatedEvent.data.end.date) : null,
+      location: updatedEvent.data.location || '',
+      description: updatedEvent.data.description || ''
+    };
+    
+  } catch (error) {
+    console.error('Error starting event:', error.message);
+    throw error;
+  }
+}
+
 function clearCache() {
   eventsCache = null;
   cacheTimestamp = null;
@@ -91,5 +143,6 @@ module.exports = {
   getLast7DaysEvents: getLastMonthEvents,
   clearCache,
   formatDate,
-  formatTime
+  formatTime,
+  startEvent
 };

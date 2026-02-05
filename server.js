@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
+const apiRouter = require('./routes/api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/', indexRouter);
 app.use('/admin', adminRouter);
+app.use('/api', apiRouter);
 
 // Err handling
 app.use((err, req, res, next) => {
