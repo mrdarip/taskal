@@ -7,6 +7,26 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <script>
+    function startEvent(eventId) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/start', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log('Event started:', response.event);
+            location.reload(); // Reload the page to reflect changes
+          } else {
+            console.error('Error starting event:', xhr.responseText);
+            alert('Error starting event: ' + xhr.responseText);
+          }
+        }
+      };
+      xhr.send(JSON.stringify({ eventId: eventId }));
+    }
+  </script>
   <h1>Taskal</h1>
   
   <% if (error === 'no_config') { %>
@@ -50,10 +70,10 @@
                 <td class="task-meta"><%= event.time || '' %></td>
                 <td class="task-meta"><%= event.duration %></td>
                 <td class="task-meta">
-                  <a href="http://localhost:5678/webhook/api/simplestart?id=<%= event.id %>" class="btn-start">start</a>
+                  <button onClick="startEvent('<%= event.id %>')" class="btn-start">start</button>
                 </td>
                 <td class="task-meta">
-                  <a href="http://localhost:5678/webhook/api/simplefinish?id=<%= event.id %>" class="btn-end">end</a>
+                  <button onClick="endEvent('<%= event.id %>')" class="btn-end">end</button>
                 </td>
               </tr>
             <% }); %>
