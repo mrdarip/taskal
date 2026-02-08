@@ -32,15 +32,7 @@ async function getLastMonthEvents() {
       maxResults: 200
     });
     
-    const events = response.data.items.map(event => ({
-      id: event.id,
-      title: event.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
-      expectedDuration: event.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
-      date: event.start.dateTime || event.start.date,
-      endDate: event.end ? (event.end.dateTime || event.end.date) : null,
-      location: event.location || '',
-      description: event.description || ''
-    }));
+    const events = response.data.items.map(event => (formatEventData(event)));
     
     // Actualizar cache
     eventsCache = events;
@@ -97,15 +89,7 @@ async function startEvent(eventId) {
     // Clear cache to force refresh on next fetch
     clearCache();
     
-    return {
-      id: updatedEvent.data.id,
-      title: updatedEvent.data.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
-      expectedDuration: updatedEvent.data.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
-      date: updatedEvent.data.start.dateTime || updatedEvent.data.start.date,
-      endDate: updatedEvent.data.end ? (updatedEvent.data.end.dateTime || updatedEvent.data.end.date) : null,
-      location: updatedEvent.data.location || '',
-      description: updatedEvent.data.description || ''
-    };
+    return formatEventData(updatedEvent.data);
     
   } catch (error) {
     console.error('Error starting event:', error.message);
@@ -150,15 +134,7 @@ async function finishEvent(eventId) {
     // Clear cache to force refresh on next fetch
     clearCache();
     
-    return {
-      id: updatedEvent.data.id,
-      title: updatedEvent.data.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
-      expectedDuration: updatedEvent.data.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
-      date: updatedEvent.data.start.dateTime || updatedEvent.data.start.date,
-      endDate: updatedEvent.data.end ? (updatedEvent.data.end.dateTime || updatedEvent.data.end.date) : null,
-      location: updatedEvent.data.location || '',
-      description: updatedEvent.data.description || ''
-    };
+    return formatEventData(updatedEvent.data);
     
   } catch (error) {
     console.error('Error finishing event:', error.message);
@@ -170,6 +146,32 @@ function clearCache() {
   eventsCache = null;
   cacheTimestamp = null;
   console.log('Cleaned cache');
+}
+
+function formatEventData(event) {
+  // handle case where summary does not match expected format
+  /* return {
+    id: event.id,
+    title: event.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
+    expectedDuration: event.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
+    date: event.start.dateTime || event.start.date,
+    endDate: event.end ? (event.end.dateTime || event.end.date) : null,
+    location: event.location || '',
+    description: event.description || ''
+  };*/
+
+  const titleMatch = event.summary ? event.summary.match(/.+(?= ?\(\d+mins?)/gmis) : null;
+  const durationMatch = event.summary ? event.summary.match(/\d+(?=mins?)/gmis) : null;
+
+  return {
+    id: event.id,
+    title: titleMatch ? titleMatch[0].trim() : event.summary || 'No title',
+    expectedDuration: durationMatch ? durationMatch[0].trim() : '?',
+    date: event.start.dateTime || event.start.date,
+    endDate: event.end ? (event.end.dateTime || event.end.date) : null,
+    location: event.location || '',
+    description: event.description || ''
+  };
 }
 
 function formatDate(dateString) {
