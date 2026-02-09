@@ -149,17 +149,6 @@ function clearCache() {
 }
 
 function formatEventData(event) {
-  // handle case where summary does not match expected format
-  /* return {
-    id: event.id,
-    title: event.summary.match(/.+(?= ?\(\d+mins?)/gmis)[0].trim() || 'No title',
-    expectedDuration: event.summary.match(/\d+(?=mins?)/gmis)[0].trim(),
-    date: event.start.dateTime || event.start.date,
-    endDate: event.end ? (event.end.dateTime || event.end.date) : null,
-    location: event.location || '',
-    description: event.description || ''
-  };*/
-
   const titleMatch = event.summary ? event.summary.match(/.+(?= ?\(\d+mins?)/gmis) : null;
   const durationMatch = event.summary ? event.summary.match(/\d+(?=mins?)/gmis) : null;
 
@@ -195,7 +184,7 @@ function formatTime(dateString) {
 }
 
 module.exports = {
-  getLast7DaysEvents: getLastMonthEvents,
+  getLastMonthEvents,
   clearCache,
   formatDate,
   formatTime,

@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
       });
     }
     
-    const events = await calendarService.getLast7DaysEvents();
+    const events = await calendarService.getLastMonthEvents();
     
     const formattedEvents = events.map(event => {
       const startDate = new Date(event.date);
