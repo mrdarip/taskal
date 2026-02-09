@@ -96,11 +96,11 @@ table.task-table th {
 }
 
 /* soft ledger striping */
-table.task-table tbody tr:nth-child(odd) td {
+.task-table tr:nth-child(odd) {
     background: #ffffff;
 }
 
-table.task-table tbody tr:nth-child(even) td {
+.task-table tr:nth-child(even){
     background: #ddd;
 }
 
@@ -109,6 +109,10 @@ td,
 th {
     border-right: 1px solid;
     border-left: 1px solid;
+}
+
+td{
+    padding: 0px;
 }
 
 table {
@@ -129,6 +133,7 @@ tr.now-indicator td {
     font-size: 0.9em;
     white-space: nowrap;
     width: 0px;
+    text-align: center;
 }
 
 /* ==============================
@@ -138,23 +143,26 @@ tr.now-indicator td {
     white-space: nowrap;
 }
 
-.btn-start,
-.btn-end {
+td.task-meta.btn-end{
+    background-color: #f5f5f5;
+    color: #000;
+    border-bottom: #000 solid 1px;
+}
+td.task-meta.btn-start {
+    background-color: #000;
+    color: #fff;
+    border-bottom: #ddd solid 1px;
+}
+
+.btn-start button,
+.btn-end button,
+.btn-del button {
     display: inline-block;
-    padding: 2px 6px;
+    padding: 1px 4px;
     font-size: 0.75em;
     font-weight: bold;
     text-decoration: none;
-    border: 1.5px solid #000;
-    color: #000;
-    background: #fff;
-}
-
-.btn-end {
-    background: #000;
-    color: #fff;
-}
-
-.btn-start {
-    margin-right: 4px;
+    border-width: 0px;
+    background-color: transparent;
+    color: inherit;
 }

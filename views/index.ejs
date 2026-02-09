@@ -76,24 +76,24 @@
         <table class="task-table">
           <thead>
             <tr>
-              <th>Tarea</th>
-              <th>Inicio</th>
+              <th colspan="2">Actions</th>
+              <th>Task</th>
+              <th>Start</th>
               <th>Mins</th>
-              <th colspan="2">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <% dayData.events.forEach(function(event) { %>
               <tr>
+                <td class="task-meta btn-start">
+                  <button onClick="startEvent('<%= event.id %>')">start</button>
+                </td>
+                <td class="task-meta btn-end">
+                  <button onClick="endEvent('<%= event.id %>')">end</button>
+                </td>
                 <td class="task-name"><%= event.title %></td>
                 <td class="task-meta"><%= event.time || '' %></td>
                 <td class="task-meta"><%= event.duration %></td>
-                <td class="task-meta">
-                  <button onClick="startEvent('<%= event.id %>')" class="btn-start">start</button>
-                </td>
-                <td class="task-meta">
-                  <button onClick="endEvent('<%= event.id %>')" class="btn-end">end</button>
-                </td>
               </tr>
             <% }); %>
           </tbody>
