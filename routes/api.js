@@ -24,6 +24,7 @@ router.post('/start', async (req, res) => {
     if (!eventId) {
         return res.status(400).json({ error: 'Missing eventId in request body' });
     }
+    
     const updatedEvent = await calendarService.startEvent(eventId);
     
     if (!updatedEvent) {

@@ -76,7 +76,11 @@ async function startEvent(eventId) {
     
     //set start time to now
     const now = new Date();
+    const eventDuration = event.end ? (new Date(event.end.dateTime || event.end.date) - new Date(event.start.dateTime || event.start.date)) : 15 * 60 * 1000; // Default to 15 mins if no end time
     event.start = { dateTime: now.toISOString() };
+    event.end = { dateTime: new Date(now.getTime() + eventDuration).toISOString() }; 
+
+    
     const updatedEvent = await calendar.events.patch({
       calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
       eventId,
