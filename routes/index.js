@@ -36,7 +36,8 @@ router.get('/', async (req, res) => {
         duration: event.expectedDuration || durationMins,
         location: event.location,
         description: event.description,
-        finished: attributes.finished || false
+        finished: attributes.finished || false,
+        endable: (new Date() >= new Date(event.date))
       };
     }).filter(event => !event.finished); // Filter out finished events
 

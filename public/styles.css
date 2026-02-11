@@ -166,3 +166,7 @@ td.task-meta.btn-start {
     background-color: transparent;
     color: inherit;
 }
+
+button:disabled {
+    text-decoration: line-through;
+}

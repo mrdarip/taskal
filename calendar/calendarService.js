@@ -156,6 +156,10 @@ function formatEventData(event) {
   const titleMatch = event.summary ? event.summary.match(/.+(?= ?\(\d+mins?)/gmis) : null;
   const durationMatch = event.summary ? event.summary.match(/\d+(?=mins?)/gmis) : null;
 
+  console.log('Formatting event, endable:', (new Date() >= new Date(event.start.dateTime || event.start.date)));
+  //Formatting event, end date: 2026-02-13T21:17:00+01:00
+
+
   return {
     id: event.id,
     title: titleMatch ? titleMatch[0].trim() : event.summary || 'No title',
@@ -163,7 +167,8 @@ function formatEventData(event) {
     date: event.start.dateTime || event.start.date,
     endDate: event.end ? (event.end.dateTime || event.end.date) : null,
     location: event.location || '',
-    description: event.description || ''
+    description: event.description || '',
+    endable: (new Date() >= new Date(event.start.dateTime || event.start.date))
   };
 }
 
