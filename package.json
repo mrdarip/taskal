@@ -7,13 +7,21 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["calendar", "google-calendar", "legacy", "ssr"],
+  "keywords": [
+    "calendar",
+    "google-calendar",
+    "legacy",
+    "ssr"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "@langchain/core": "^1.1.24",
+    "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
+    "express": "^4.18.2",
     "googleapis": "^128.0.0",
-    "dotenv": "^16.3.1"
+    "langchain": "^1.2.23",
+    "pg": "^8.18.0"
   }
 }
