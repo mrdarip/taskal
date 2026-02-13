@@ -38,7 +38,7 @@
           if (xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
             console.log('Event ended:', response.event);
-            location.reload(); // Reload the page to reflect changes
+            removeTaskTr(eventId); // Remove the task row from the table
           } else {
             console.error('Error ending event:', xhr.responseText);
             showError('Error ending event: ' + xhr.responseText);
@@ -129,6 +129,13 @@
       errorBox.textContent = '';
       errorBox.style.display = 'none';
     }
+
+    function removeTaskTr(taskId) {
+      var tr = document.getElementById('tr-' + taskId);
+      if (tr) {
+        tr.parentNode.removeChild(tr);
+      }
+    }
   </script>
   <h1>Taskal</h1>
 
@@ -182,7 +189,7 @@
           </thead>
           <tbody>
             <% dayData.events.forEach(function(event) { %>
-              <tr>
+              <tr id="tr-<%= event.id %>">
                 <td class="task-meta btn-start">
                   <button onClick="startEvent('<%= event.id %>')">start</button>
                 </td>
