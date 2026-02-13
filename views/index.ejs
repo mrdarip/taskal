@@ -8,6 +8,8 @@
 </head>
 <body>
   <script>
+    var tasksToSend = [];
+
     function startEvent(eventId) {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', '/api/start', true);
@@ -20,7 +22,7 @@
             location.reload(); // Reload the page to reflect changes
           } else {
             console.error('Error starting event:', xhr.responseText);
-            alert('Error starting event: ' + xhr.responseText);
+            showError('Error starting event: ' + xhr.responseText);
           }
         }
       };
@@ -39,14 +41,110 @@
             location.reload(); // Reload the page to reflect changes
           } else {
             console.error('Error ending event:', xhr.responseText);
-            alert('Error ending event: ' + xhr.responseText);
+            showError('Error ending event: ' + xhr.responseText);
           }
         }
       };
       xhr.send(JSON.stringify({ eventId: eventId }));
     }
+
+    function addTask() {
+      var taskInput = document.getElementById('task');
+      var expectedMinsInput = document.getElementById('expected-mins');
+
+      var taskName = taskInput.value;
+      var expectedMins = expectedMinsInput.value;
+
+      if (!taskName) {
+        showError('Please enter a task name');
+        return;
+      }
+      if (!expectedMins || isNaN(expectedMins) || expectedMins <= 0) {
+        showError('Please enter a valid number of expected minutes');
+        return;
+      }
+
+      tasksToSend.push({ title: taskName, expectedMins: expectedMins });
+
+      clearError();
+      showTasksToAdd();
+    }
+
+    function sendAllTasks() {
+      for (var i = 0; i < tasksToSend.length; i++) {
+        var task = tasksToSend[i];
+        uploadTask(task.title, task.expectedMins);
+      }
+    }
+
+    function uploadTask(taskName, expectedMins) {
+      // curl -X POST -H "Content-Type: application/json" -d '{"title": "Test Event", "expectedDuration": 60}' http://localhost:3000/api/create
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/create', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var response = JSON.parse(xhr.responseText);
+              console.log('Task created:', response.event);
+              location.reload(); // Reload the page to reflect changes
+            } else {
+              console.error('Error creating task:', xhr.responseText);
+              showError('Error creating task: ' + xhr.responseText);
+            }
+          }
+        };
+        xhr.send(JSON.stringify({ title: taskName, expectedDuration: expectedMins }));
+    }
+
+    function enableAddTask() {
+      var addTaskDiv = document.getElementById('add-task');
+      var addTaskButton = document.getElementById('add-task-button');
+
+      addTaskButton.style.display = "none";
+      addTaskDiv.style.display = "block";
+    }
+
+    function showError(message) {
+      var errorBox = document.querySelector('#add-task .error-box');
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+    }
+
+    function showTasksToAdd() {
+      var tasksList = document.getElementById('tasks-to-add');
+      tasksList.innerHTML = '';
+
+      for (var i = 0; i < tasksToSend.length; i++) {
+        var task = tasksToSend[i];
+        var listItem = document.createElement('li');
+        listItem.textContent = task.title + ' - ' + task.expectedMins + ' mins';
+        tasksList.appendChild(listItem);
+      }
+    }
+
+    function clearError() {
+      var errorBox = document.querySelector('#add-task .error-box');
+      errorBox.textContent = '';
+      errorBox.style.display = 'none';
+    }
   </script>
   <h1>Taskal</h1>
+
+  <div id="add-task" style="display: none;">
+    <div class="error-box"></div>
+    <input type="text" name="task" id="task" placeholder="task name" autocomplete>
+    <input type="text" name="expected mins"  placeholder="mins" id="expected-mins">
+    <button onclick="addTask();">add</button>
+
+    <ul id="tasks-to-add">
+    </ul>
+
+    <button onClick="sendAllTasks()">Send All</button>
+  </div>
+  <button onClick="enableAddTask()" id="add-task-button">Add Task</button>
+  
   
   <% if (error === 'no_config') { %>
     <div class="error-box">

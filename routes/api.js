@@ -65,4 +65,26 @@ router.post('/finish', async (req, res) => {
   }
 });
 
+// POST /api/create
+router.post('/create', async (req, res) => {
+  try {
+    const hasTokens = await tokenStore.hasTokens();
+    if (!hasTokens) {
+      return res.status(400).json({ error: 'No Google Calendar configuration found' });
+    }
+
+    const { title, expectedDuration } = req.body;
+
+    if (!title || !expectedDuration) {
+      return res.status(400).json({ error: 'Missing title or expectedDuration in request body' });
+    }
+
+    const newEvent = await calendarService.createEvent(title, expectedDuration);
+    res.json({ event: newEvent });
+  }catch (error) {
+    console.error('Error in /api/create:', error);
+    res.status(500).send('Error loading API data');
+  }
+});
+
 module.exports = router;

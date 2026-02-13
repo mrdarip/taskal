@@ -146,6 +146,31 @@ async function finishEvent(eventId) {
   }
 }
 
+async function createEvent(title, expectedDuration) {
+  try {
+    const auth = await googleClient.getAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth });
+
+    const eventResponse = await calendar.events.insert({
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      requestBody: {
+        summary: `${title} (${expectedDuration}mins)`,
+        start: {
+          dateTime: new Date().toISOString()
+        },
+        end: {
+          dateTime: new Date(Date.now() + expectedDuration * 60 * 1000).toISOString()
+        },
+        description: JSON.stringify({ finished: false })
+      }
+    });
+
+  }catch (error) {
+    console.error('Error creating event:', error.message);
+    throw error;
+  }
+}
+
 function clearCache() {
   eventsCache = null;
   cacheTimestamp = null;
@@ -155,10 +180,6 @@ function clearCache() {
 function formatEventData(event) {
   const titleMatch = event.summary ? event.summary.match(/.+(?= ?\(\d+mins?)/gmis) : null;
   const durationMatch = event.summary ? event.summary.match(/\d+(?=mins?)/gmis) : null;
-
-  console.log('Formatting event, endable:', (new Date() >= new Date(event.start.dateTime || event.start.date)));
-  //Formatting event, end date: 2026-02-13T21:17:00+01:00
-
 
   return {
     id: event.id,
@@ -198,5 +219,6 @@ module.exports = {
   formatDate,
   formatTime,
   startEvent,
-  finishEvent
+  finishEvent,
+  createEvent
 };
