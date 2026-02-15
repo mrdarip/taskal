@@ -171,6 +171,25 @@ async function createEvent(title, expectedDuration) {
   }
 }
 
+async function deleteEvent(eventId) {
+  try {
+    const auth = await googleClient.getAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth });
+
+    await calendar.events.delete({
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
+      eventId
+    });
+
+    // Clear cache to force refresh on next fetch
+    clearCache();
+
+  } catch (error) {
+    console.error('Error deleting event:', error.message);
+    throw error;
+  }
+}
+
 function clearCache() {
   eventsCache = null;
   cacheTimestamp = null;
@@ -220,5 +239,6 @@ module.exports = {
   formatTime,
   startEvent,
   finishEvent,
-  createEvent
+  createEvent,
+  deleteEvent
 };

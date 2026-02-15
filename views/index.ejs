@@ -78,8 +78,6 @@
     }
 
     function uploadTask(taskName, expectedMins) {
-      // curl -X POST -H "Content-Type: application/json" -d '{"title": "Test Event", "expectedDuration": 60}' http://localhost:3000/api/create
-
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/create', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -136,6 +134,25 @@
         tr.parentNode.removeChild(tr);
       }
     }
+
+    function deleteEvent(eventId) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', '/api/delete', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log('Event deleted:', response.message);
+            removeTaskTr(eventId);
+          } else {
+            console.error('Error deleting event:', xhr.responseText);
+            showError('Error deleting event: ' + xhr.responseText);
+          }
+        }
+      };
+      xhr.send(JSON.stringify({ eventId: eventId }));
+    }
   </script>
   <h1>Taskal</h1>
 
@@ -181,7 +198,7 @@
         <table class="task-table">
           <thead>
             <tr>
-              <th colspan="2">Actions</th>
+              <th colspan="3">Actions</th>
               <th>Task</th>
               <th>Start</th>
               <th>Mins</th>
@@ -196,6 +213,10 @@
                 <td class="task-meta btn-end">
                   <button onClick="endEvent('<%= event.id %>')" <%= event.endable ? '' : 'disabled' %>>end</button>
                 </td>
+                <td class="task-meta btn-del">
+                  <button onClick="deleteEvent('<%= event.id %>')">del</button>
+                </td>
+
                 <td class="task-name"><%= event.title %></td>
                 <td class="task-meta"><%= event.time || '' %></td>
                 <td class="task-meta"><%= event.duration %></td>

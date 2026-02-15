@@ -153,6 +153,11 @@ td.task-meta.btn-start {
     color: #fff;
     border-bottom: #ddd solid 1px;
 }
+td.task-meta.btn-del {
+    background-color: #3b3b3b;
+    color: #c7c7c7;
+    border-bottom: #141414 solid 1px;
+}
 
 .btn-start button,
 .btn-end button,

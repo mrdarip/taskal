@@ -87,4 +87,26 @@ router.post('/create', async (req, res) => {
   }
 });
 
+// DELETE /api/delete
+router.delete('/delete', async (req, res) => {
+  try {
+    const hasTokens = await tokenStore.hasTokens();
+    if (!hasTokens) {
+      return res.status(400).json({ error: 'No Google Calendar configuration found' });
+    }
+
+    const { eventId } = req.body;
+
+    if (!eventId) {
+      return res.status(400).json({ error: 'Missing eventId in request body' });
+    }
+
+    await calendarService.deleteEvent(eventId);
+    res.json({ message: 'Event deleted successfully' });
+  }catch (error) {
+    console.error('Error in /api/delete:', error);
+    res.status(500).send('Error loading API data');
+  }
+});
+
 module.exports = router;
