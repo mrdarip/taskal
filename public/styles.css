@@ -74,6 +74,7 @@ h1 {
       ============================== */
 .table-wrap {
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 table.task-table {
