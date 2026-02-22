@@ -131,7 +131,8 @@ async function finishEvent(eventId) {
       eventId,
       requestBody: {
         ...event,
-        description: JSON.stringify(attributes)
+        description: JSON.stringify(attributes),
+        colorId: process.env.GOOGLE_COMPLTETED_COLOR || undefined
       }
     });
     
