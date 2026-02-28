@@ -19,17 +19,17 @@ async function getLastMonthEvents() {
     const now = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(now.getDate() + 2);
-    const tenDaysAgo = new Date();
-    tenDaysAgo.setDate(now.getDate() - 10);
+    const monthAgo = new Date();
+    monthAgo.setDate(now.getDate() - 30);
     
     // Obtener eventos
     const response = await calendar.events.list({
       calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
-      timeMin: tenDaysAgo.toISOString(),
+      timeMin: monthAgo.toISOString(),
       timeMax: tomorrow.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
-      maxResults: 200
+      maxResults: 500
     });
     
     const events = response.data.items.map(event => (formatEventData(event)));
