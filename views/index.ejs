@@ -217,7 +217,7 @@
                   <button onClick="deleteEvent('<%= event.id %>')">del</button>
                 </td>
 
-                <td class="task-name"><%= event.title %></td>
+                <td class="task-name"><a href="<%= event.htmlLink %>" target="_blank"><%= event.title %></a></td>
                 <td class="task-meta"><%= event.time || '' %></td>
                 <td class="task-meta"><%= event.duration %></td>
               </tr>

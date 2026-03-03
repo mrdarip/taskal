@@ -37,8 +37,9 @@ router.get('/', async (req, res) => {
         location: event.location,
         description: event.description,
         finished: attributes.finished || false,
-        endable: (new Date() >= new Date(event.date))
-      };
+        endable: (new Date() >= new Date(event.date)),
+        htmlLink: event.htmlLink || '',
+      }; //TODO: clean this mess!!
     }).filter(event => !event.finished); // Filter out finished events
 
     const eventsGroupedByDate = {};

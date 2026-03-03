@@ -209,7 +209,8 @@ function formatEventData(event) {
     endDate: event.end ? (event.end.dateTime || event.end.date) : null,
     location: event.location || '',
     description: event.description || '',
-    endable: (new Date() >= new Date(event.start.dateTime || event.start.date))
+    endable: (new Date() >= new Date(event.start.dateTime || event.start.date)),
+    htmlLink: event.htmlLink || '',
   };
 }
 
